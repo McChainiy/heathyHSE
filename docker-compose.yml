@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: healthyhse-app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head && python -m bot.bot"
+
+  db:
+    image: postgres:16
+    container_name: healthyhse-db
+    environment:
+      POSTGRES_USER: healthyhse_user
+      POSTGRES_PASSWORD: hse0213
+      POSTGRES_DB: healthyHSE
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthyhse_user -d healthyHSE"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+volumes:
+  postgres_data:
