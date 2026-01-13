@@ -12,8 +12,9 @@ import matplotlib
 import logging
 from tempfile import NamedTemporaryFile
 
-
 from random import randrange
+
+from services.weather_service import WeatherService
 
 
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
@@ -130,6 +131,23 @@ class UserService:
             user.logged_calories = 0
             user.burned_calories = 0
             user.added_water = 0
+            # перерасчет нормы калорий и воды
+            weather_service = WeatherService()
+            temp = weather_service.check_weather_sync(user.weight)
+            water_goal = 30 * user.weight + 500 * (user.weight / 30) + 500
+            calorie_goal = 10 * user.weight + 6.25 * user.height - 5 * user.age
+            print(temp)
+            if temp is None or temp < 10:
+                pass
+            elif 10 < temp < 20:
+                water_goal += 10 * user.weight
+                calorie_goal = 0.95 * calorie_goal
+            else: 
+                water_goal += 15 * user.weight
+                calorie_goal = 0.9 * calorie_goal
+            user.water_goal = water_goal
+            user.calorie_goal = calorie_goal
+
             user.cur_date = date.today()
 
             self.session.commit()
@@ -293,13 +311,10 @@ class UserService:
             return "Время для сна, сейчас лучше воздержаться от употребления еды или упражнений."
         user = self.get_profile(tg_id)
         time_value = hour * 4 / (24 * 4)
-        # print(time_value)
         cur_water_diff = int(user.water_goal * time_value + user.added_water) - int(user.logged_water)
-        # water_diff = int(user.water_goal + user.added_water) - int(user.logged_water)
         cur_calorie_diff = int(user.calorie_goal * time_value + user.burned_calories) - int(user.logged_calories)
         activity_time_diff = activity_goal * time_value - user.burned_calories / 10
         
-        # print(cur_water_diff, cur_calorie_diff, user.burned_calories / 10)
         text = []
         if 500 > cur_water_diff > 0:
             if activity_time_diff > 0:
@@ -323,12 +338,15 @@ class UserService:
             text.append(f"Калории в порядке, можно перекусить! Например: {product[0]} - {product[1]} ккал")
         elif cur_calorie_diff > 300:
             text.append(f"Нужно еще {cur_calorie_diff} калорий")
-            if time_value < 0.3:
+            if waking < hour < waking + 5:
                 text.append(f"Пора завтракать!")
-            elif 0.3 < time_value < 0.7:
+            elif waking + 5 < hour < waking + 10:
                 text.append(f"Пора обедать!")
-            else:
+            elif waking + 10 < hour < bedtime - 3:
                 text.append(f"Пора ужинать!")
+            else:
+                text.append(f"Сейчас не лучшее время, чтобы есть.\n"
+                            f"Поэтому придерживайся дефицита калорий")
         else:
             text.append(f"Калории выше нормы! Позанимайся спортом ({max(-cur_calorie_diff / 10, 5)} минут) и не забудь взять воду!")
 

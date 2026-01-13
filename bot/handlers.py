@@ -9,11 +9,12 @@ from db.db import get_session
 
 from bot.states import ProfileStates, WaterStates, CaloriesStates, WorkoutStates
 from bot.keyboards import main_kb, build_products_keyboard, start_kb, profile_kb
-from bot.keyboards import BTN_GET_PROFILE, BTN_CHECK_PROGRESS, BTN_CHECK_HISTORY, BTN_GET_RECOMMENDATION, BTN_BACK_TO_MAIN
+from bot.keyboards import BTN_GET_PROFILE, BTN_CHECK_PROGRESS, BTN_CHECK_HISTORY, BTN_GET_RECOMMENDATION, BTN_BACK_TO_MAIN, BTN_UPDATE_PROFILE
 from bot.keyboards import BTN_LOG_FOOD, BTN_LOG_WATER, BTN_LOG_WORKOUT
 
 from services.user_service import UserService
 from services.food_service import FoodService
+from services.weather_service import WeatherService
 
 import os
 
@@ -24,7 +25,16 @@ router = Router()
 
 @router.message(Command("help"))
 async def cmd_help(message: Message):
-    await message.reply("Я могу ответить на команды /start и /help.",
+    await message.reply(f"/start - создание пользователя",
+                        f"/set_profile - настройка профиля",
+                        f"/delete_profile - удаление профиля",
+                        f"/get_profile - просмотр профиля",
+                        f"/log_water - добавление воды",
+                        f"/log_food - добавление еды",
+                        f"/log_workout - добавление тренировки",
+                        f"/check_progress - просмотр прогресса",
+                        f"/check_history - просмотр истории",
+                        f"/get_recommendation - получить рекомендацию",
                         reply_markup=start_kb)
 
 @router.message(Command("start"))
@@ -39,6 +49,12 @@ async def cmd_start(message: Message):
 
 
 ### /set_profile
+
+### /get_profile
+@router.message(F.text == BTN_UPDATE_PROFILE)
+async def set_profile_btn(message: Message, state: FSMContext):
+    await start_profile(message=message, state=state)
+
 @router.message(Command("set_profile"))
 async def start_profile(message: Message, state: FSMContext):
     with get_session() as session:
@@ -97,8 +113,22 @@ async def set_city(message: Message, state: FSMContext):
 
     data = await state.get_data()
     await state.clear()
+    weather_service = WeatherService()
+    temp = await weather_service.check_weather(data['city'])
+    # расчет воды
     water_goal = 30 * data['weight'] + 500 * (data['activity'] / 30) + 500
+    # расчет калорий
     calorie_goal = 10 * data["weight"] + 6.25 * data["height"] - 5 * data["age"]
+
+    print(temp)
+    if temp is None or temp < 10:
+        pass
+    elif 10 < temp < 20:
+        water_goal += 10 * data['weight']
+        calorie_goal = 0.95 * calorie_goal
+    else: 
+        water_goal += 15 * data['weight']
+        calorie_goal = 0.9 * calorie_goal
     with get_session() as session:
         service = UserService(session)
         service.update_user(
@@ -112,7 +142,7 @@ async def set_city(message: Message, state: FSMContext):
             calorie_goal=calorie_goal
         )
 
-    await message.answer("✅ Профиль успешно сохранён!", reply_markup=main_kb)
+    await message.answer(f"✅ Профиль успешно сохранён!", reply_markup=main_kb)
 
 
 ### /get_profile
@@ -133,7 +163,6 @@ async def get_profile(message: Message):
     if not user.age:
         await message.answer("❌ Профиль не настроен. Используйте /set_profile", reply_markup=start_kb)
         return
-
     calorie_goal = f"{user.calorie_goal:.1f}" if user.calorie_goal else "-"
     water_goal = f"{user.water_goal:.1f}" if user.water_goal else "-"
     text = (

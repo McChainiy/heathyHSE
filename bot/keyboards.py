@@ -9,6 +9,7 @@ BTN_GET_PROFILE = "👤 Профиль"
 
 BTN_CHECK_HISTORY = "📋 История"
 BTN_GET_RECOMMENDATION = "📝 Рекомендации"
+BTN_UPDATE_PROFILE = "🔄 Обновить профиль"
 BTN_BACK_TO_MAIN = "⬅️ Назад"
 
 
@@ -26,7 +27,7 @@ main_kb = ReplyKeyboardMarkup(
 
 profile_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text=BTN_CHECK_HISTORY), KeyboardButton(text=BTN_GET_RECOMMENDATION)],
+        [KeyboardButton(text=BTN_CHECK_HISTORY), KeyboardButton(text=BTN_GET_RECOMMENDATION), KeyboardButton(text=BTN_UPDATE_PROFILE)],
         [KeyboardButton(text=BTN_BACK_TO_MAIN)],
     ],
     resize_keyboard=True
