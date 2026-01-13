@@ -29,4 +29,6 @@ COPY . .
 
 # CMD ["python", "-m", "bot.bot"]
 
-CMD python app/server.py & alembic upgrade head && python -m bot.bot
+# CMD python app/server.py & alembic upgrade head && python -m bot.bot
+
+CMD alembic upgrade head && python -m bot.bot
