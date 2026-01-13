@@ -28,10 +28,12 @@ class WeatherService:
             "units": "metric",
             "lang": "ru"
         }
-
-        response = requests.get(self.url, params=params)
-        if response.status != 200:
-            return None
-        response = response.json()
-        temp = response['main']['temp']
+        try:
+            response = requests.get(self.url, params=params)
+            if response.status != 200:
+                return None
+            response = response.json()
+            temp = response['main']['temp']
+        except:
+            temp = None
         return temp

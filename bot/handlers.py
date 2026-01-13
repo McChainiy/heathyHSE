@@ -25,16 +25,16 @@ router = Router()
 
 @router.message(Command("help"))
 async def cmd_help(message: Message):
-    await message.reply(f"/start - создание пользователя",
-                        f"/set_profile - настройка профиля",
-                        f"/delete_profile - удаление профиля",
-                        f"/get_profile - просмотр профиля",
-                        f"/log_water - добавление воды",
-                        f"/log_food - добавление еды",
-                        f"/log_workout - добавление тренировки",
-                        f"/check_progress - просмотр прогресса",
-                        f"/check_history - просмотр истории",
-                        f"/get_recommendation - получить рекомендацию",
+    await message.reply(text=(
+                            "/start - создание пользователя\n"
+                            "/set_profile - настройка профиля\n"
+                            "/get_profile - просмотр профиля\n"
+                            "/log_water - добавление воды\n"
+                            "/log_food - добавление еды\n"
+                            "/log_workout - добавление тренировки\n"
+                            "/check_progress - просмотр прогресса\n"
+                            "/get_recommendation - получить рекомендацию"
+                        ),
                         reply_markup=start_kb)
 
 @router.message(Command("start"))
