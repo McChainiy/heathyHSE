@@ -3,6 +3,8 @@ import aiohttp
 class FoodService:
     BASE_URL = "https://world.openfoodfacts.org/cgi/search.pl"
 
+
+    # для создания этой функции я пользовался chatGPT
     async def search_products(
         self,
         query: str,

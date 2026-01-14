@@ -16,10 +16,10 @@ from random import randrange
 
 from services.weather_service import WeatherService
 
-
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
 matplotlib.use("Agg")
 
+# словарь сгенерирован в chatGPT
 low_cal_snacks = {
     "огурец": 16,
     "помидор": 18,
@@ -48,22 +48,11 @@ low_cal_snacks = {
     "попкорн без масла": 31
 }
 
-def find_closest_snack(target_kcal: int, snacks: dict) -> tuple:
+def find_closest_snack(target_kcal: int, snacks: dict):
     return min(
         snacks.items(),
         key=lambda item: abs(item[1] - target_kcal)
     )
-
-
-def random_date(start, end):
-    """
-    This function will return a random datetime between two datetime 
-    objects.
-    """
-    delta = end - start
-    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-    random_second = randrange(int_delta)
-    return start + timedelta(seconds=random_second)
 
 
 class UserService:
@@ -112,7 +101,6 @@ class UserService:
         # d2 = datetime.strptime('1/1/2024 4:50 AM', '%m/%d/%Y %I:%M %p')
         # curdate = random_date(d1, d2)
         # #
-
 
         curdate = date.today()
         if user.cur_date != curdate:
@@ -238,6 +226,7 @@ class UserService:
 
         user = self.get_profile(tg_id)
         
+        # график построен частично с помощью chatGPT
         plt.figure(figsize=(12, 6))
         plt.plot(x, y1, marker='o', label='Вода', color='blue', linewidth=2)
         plt.plot(x, y2, marker='s', label='Калории', color='orange', linewidth=2)
@@ -280,6 +269,7 @@ class UserService:
         return tmp_file.name
     
 
+    # # TODO: написать фукнцию для построения исторического графика
     # def build_history_stats(self, tg_id: int):
     #     today_logs = (
     #             self.session

@@ -49,8 +49,6 @@ async def cmd_start(message: Message):
 
 
 ### /set_profile
-
-### /get_profile
 @router.message(F.text == BTN_UPDATE_PROFILE)
 async def set_profile_btn(message: Message, state: FSMContext):
     await start_profile(message=message, state=state)

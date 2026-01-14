@@ -3,7 +3,6 @@ from aiogram.types import Message
 from typing import Callable, Dict, Any
 from services.logger import logger
 
-
 class LoggingMiddleware(BaseMiddleware):
     async def __call__(
         self,
