@@ -4,12 +4,7 @@ from typing import Callable, Dict, Any
 from services.logger import logger
 
 class LoggingMiddleware(BaseMiddleware):
-    async def __call__(
-        self,
-        handler: Callable,
-        event: Message,
-        data: Dict[str, Any],
-    ):
+    async def __call__(self, handler: Callable, event: Message, data: Dict[str, Any]):
         if isinstance(event, Message):
             text = event.text or "<no text>"
             logger.info(f"Получено сообщение: {text}")

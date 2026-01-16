@@ -86,7 +86,7 @@ class UserService:
         self.session.commit()
         return user
     
-    def get_profile(self, tg_id: int) -> User | None:
+    def get_profile(self, tg_id: int):
         user = (
             self.session
             .query(User)
@@ -142,7 +142,7 @@ class UserService:
             self.session.refresh(user)
         return user
 
-    def delete_profile(self, tg_id: int) -> bool:
+    def delete_profile(self, tg_id: int):
         user = (
             self.session
             .query(User)

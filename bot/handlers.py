@@ -118,7 +118,6 @@ async def set_city(message: Message, state: FSMContext):
     # расчет калорий
     calorie_goal = 10 * data["weight"] + 6.25 * data["height"] - 5 * data["age"]
 
-    print(temp)
     if temp is None or temp < 10:
         pass
     elif 10 < temp < 20:
@@ -332,10 +331,9 @@ async def show_products(message: Message, state: FSMContext):
     await message.answer("Выберите продукт:", reply_markup=keyboard)
 
 
-@router.callback_query(
-    CaloriesStates.browsing_results,
-    lambda c: c.data in ["page:prev", "page:next"]
-)
+@router.callback_query(CaloriesStates.browsing_results, 
+                       lambda c: c.data in ["page:prev", "page:next"]
+                       )
 async def paginate_products(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     page = data["page"]
@@ -361,10 +359,9 @@ async def paginate_products(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.callback_query(
-    CaloriesStates.browsing_results,
-    lambda c: c.data.startswith("food:")
-)
+@router.callback_query(CaloriesStates.browsing_results,
+                       lambda c: c.data.startswith("food:")
+                       )
 async def choose_product(callback: CallbackQuery, state: FSMContext):
     index = int(callback.data.split(":")[1])
 

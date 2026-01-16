@@ -36,48 +36,38 @@ profile_kb = ReplyKeyboardMarkup(
 start_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text=BTN_START)],
-        [KeyboardButton(text=BTN_HELP), 
-         KeyboardButton(text=BTN_SET_PROFILE)],
+        [KeyboardButton(text=BTN_HELP), KeyboardButton(text=BTN_SET_PROFILE)],
     ],
     resize_keyboard=True
 )
 
+# переключение между страницами подсмотрел в chatGPT
 def build_products_keyboard(products, page, total_pages):
     keyboard = []
-
     for i, product in enumerate(products):
         keyboard.append([
             InlineKeyboardButton(
-                text=product["name"],
-                callback_data=f"food:{i}"
-            )
+                text=product["name"], callback_data=f"food:{i}")
         ])
-
     nav = []
 
     if page > 1:
         nav.append(
             InlineKeyboardButton(
-                text="⬅️",
-                callback_data="page:prev"
+                text="⬅️", callback_data="page:prev"
             )
         )
-
     nav.append(
         InlineKeyboardButton(
-            text=f"{page}/{total_pages}",
-            callback_data="noop"
+            text=f"{page}/{total_pages}", callback_data="noop"
         )
     )
-
     if page < total_pages:
         nav.append(
             InlineKeyboardButton(
-                text="➡️",
-                callback_data="page:next"
+                text="➡️", callback_data="page:next"
             )
         )
-
     keyboard.append(nav)
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
